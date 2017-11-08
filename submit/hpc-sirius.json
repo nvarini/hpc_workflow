@@ -1,0 +1,12 @@
+{
+ "query_group" : "pw_scf_final_test_bench_small_v2",
+ "pseudo" : "sssp_eff_pbe_2",
+ "num_threads": [1], "nodes": [1],
+ "max_wallclock_seconds": 800,
+ "profiler": ["none"],
+ "with_sirius": "yes",
+ "prepend_text_threads" : ["OMP_NUM_THREADS"],
+ "prepend_text_others" : [],
+ "automatic" : "no",
+ "scale" : [1,1,1]
+}

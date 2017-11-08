@@ -1,0 +1,22 @@
+{
+    "CONTROL" : 
+                     {
+                      "wf_collect":false,
+                      "disk_io":"none",
+                      "calculation":"scf",
+                      "restart_mode":"from_scratch",
+                      "max_seconds":86400
+                     }  
+                ,
+    "ELECTRONS" : 
+                     {
+                         "electron_maxstep":15,
+                         "conv_thr":1e-20    
+                     } 
+                  ,
+    "SYSTEM" : 
+                  {
+                      "nosym":true
+                  }
+               
+}
