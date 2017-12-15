@@ -1,0 +1,10 @@
+{
+ "pseudo" : "sssp_eff_pbe_2",
+ "num_threads": [1], "nodes": [1,2],
+ "max_wallclock_seconds": 80000,
+ "profiler": ["none"],
+ "with_sirius": "no",
+ "prepend_text_threads" : ["OMP_NUM_THREADS"],
+ "prepend_text_others" : [],
+ "automatic" : "no"
+}

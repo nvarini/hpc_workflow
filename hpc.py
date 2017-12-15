@@ -28,6 +28,14 @@ def scorep_analysis(calc):
     string = "cube_stat  -p -t 100 scorep/profile.cubex > profile.cube_stat;" 
     calc.set_append_text(string)
 
+def vtune_analysis(calc,analysis):
+    """
+    Postprocess vtune file
+    """
+    string = "amplxe-cl -report "+analysis+" -result-dir vtune_profile > profile.vtune"
+    calc.set_append_text(string)
+
+
 def create_pw_calculation(the_wf, parallelization_dict, 
                          only_initialization=False):
     """
@@ -38,6 +46,8 @@ def create_pw_calculation(the_wf, parallelization_dict,
     # pw input parameters
     work_params = the_wf.get_parameters()
     profiler = work_params['hpc_params'].get_dict()['profiler'][0]
+    if len(work_params['hpc_params'].get_dict()['profiler']) > 1:
+        analysis = work_params['hpc_params'].get_dict()['profiler'][1]
     with_sirius = work_params['hpc_params'].get_dict()['with_sirius']
     prepend_text_threads = work_params['hpc_params'].get_dict()['prepend_text_threads']
     prepend_text_others = work_params['hpc_params'].get_dict()['prepend_text_others']
@@ -94,6 +104,11 @@ def create_pw_calculation(the_wf, parallelization_dict,
     if only_initialization:
         if with_sirius is not "yes":
            settings_dict['ONLY_INITIALIZATION'] = True
+        if profiler == 'vtune':
+          settings = ParameterData(dict={'CMDLINE':parallelization_parameters, 'additional_retrieve_list': ['profile.vtune'] })
+          prepend_mpirun = []
+          calc.set_mpirun_extra_params(prepend_mpirun)
+
         settings = ParameterData(dict=settings_dict)
         calc.use_settings(settings)
     elif only_initialization == False and with_sirius == "no": 
@@ -110,6 +125,11 @@ def create_pw_calculation(the_wf, parallelization_dict,
        if profiler == 'scorep':
          settings = ParameterData(dict={'CMDLINE':parallelization_parameters, 'additional_retrieve_list': ['profile.cube_stat'] })
          scorep_analysis(calc)
+       elif profiler == 'vtune':
+         settings = ParameterData(dict={'CMDLINE':parallelization_parameters, 'additional_retrieve_list': ['profile.vtune','vtune_profile'] })
+         prepend_mpirun = str('amplxe-cl -collect '+analysis+' -result-dir vtune_profile').split()
+         calc.set_mpirun_extra_params(prepend_mpirun)
+         vtune_analysis(calc,analysis)
        else:
           settings = ParameterData(dict={'CMDLINE':parallelization_parameters})
     elif with_sirius == "yes" and only_initialization == False:
@@ -139,17 +159,11 @@ class HpcWorkflow(Workflow):
     def start(self):
         wf_params = self.get_parameters()
         # Here place validation of the input
-        validation_is_passed=True
-        
         self.append_to_report("Hpc Workflow started")
-        if validation_is_passed:
-            self.next(self.dry_run)
-        else:
-            self.next(self.exit)
+        self.next(self.dry_run)
 
     @Workflow.step
     def dry_run(self):
-          
         wf_params = self.get_parameters()
         hpc_params = wf_params['hpc_params'].get_dict()
         nodes_dry_run = hpc_params['nodes'][0]
@@ -166,11 +180,13 @@ class HpcWorkflow(Workflow):
         calc.store_all()
         self.attach_calculation(calc)
         self.next(self.launch_calculation)
+        #self.next(self.exit)
 
     @Workflow.step
     def launch_calculation(self):
         wf_params = self.get_parameters()
         hpc_params = wf_params['hpc_params'].get_dict()
+        #extras = wf_params['extras']
         is_automatic = wf_params['hpc_params'].get_dict()['automatic']
         with_sirius = wf_params['hpc_params'].get_dict()['with_sirius']
         dry_run = self.get_step_calculations(self.dry_run)[0]
@@ -229,6 +245,7 @@ class HpcWorkflow(Workflow):
             calc.set_extra('parallelization_dict',parallelization_dict)
             calc.set_extra('configuration_nd',configuration_nd)
             calc.set_extra('configuration_threads',configuration_threads)
+            #calc.set_extra('system type',extras)
             self.attach_calculation(calc)
 
         self.next(self.exit)

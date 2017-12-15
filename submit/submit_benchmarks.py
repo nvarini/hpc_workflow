@@ -36,8 +36,9 @@ hpc_workflow_params = {}
 keys = []
 count=0
 
-for i in calcs_list[0:1]:
-#for i in calcs_list:
+
+#for i in calcs_list[0:1]:
+for i in calcs_list:
      calc = i[0]
      struct = calc.get_inputs_dict()['structure']
      kpoints = KpointsData()
