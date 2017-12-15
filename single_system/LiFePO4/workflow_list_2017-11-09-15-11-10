@@ -1,1 +1,0 @@
-{u'num_threads': [1], u'scale': [1, 1, 1], u'input_file': u'pw.in', u'automatic': u'no', u'pseudo': u'sssp_eff_pbe_2', u'profiler': [u'none'], u'query_group': u'pw_final_test_bench_small', u'max_wallclock_seconds': 80000, u'with_sirius': u'no', u'nodes': [4, 9, 16, 25, 36, 49, 64], u'prepend_text_threads': [u'OMP_NUM_THREADS'], u'prepend_text_others': []}
