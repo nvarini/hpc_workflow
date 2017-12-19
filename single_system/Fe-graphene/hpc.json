@@ -6,5 +6,6 @@
  "with_sirius": "no",
  "prepend_text_threads" : ["OMP_NUM_THREADS"],
  "prepend_text_others" : [],
- "automatic" : "no"
+ "automatic" : "no",
+ "gamma_only" : true
 }

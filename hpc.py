@@ -131,7 +131,11 @@ def create_pw_calculation(the_wf, parallelization_dict,
          calc.set_mpirun_extra_params(prepend_mpirun)
          vtune_analysis(calc,analysis)
        else:
-          settings = ParameterData(dict={'CMDLINE':parallelization_parameters})
+         settings = ParameterData(dict={'CMDLINE':parallelization_parameters})
+       
+       
+       if work_params['hpc_params'].get_attrs()['gamma_only'] is True:
+         settings.update_dict({'gamma_only': True})
     elif with_sirius == "yes" and only_initialization == False:
          parallelization_parameters.append('-sirius')
          prepend_mpirun = []
